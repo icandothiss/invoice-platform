@@ -1,0 +1,11 @@
+{
+  "name": "invoice-platform",
+  "version": "1.0.0",
+  "description": "Invoicing App",
+  "main": "server.js",
+  "scripts": {
+    "start": "node backend/server.js"
+  },
+  "author": "Oussama",
+  "license": "MIT"
+}
