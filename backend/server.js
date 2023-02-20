@@ -13,9 +13,21 @@ connectDB();
 const app = express();
 
 // Dev loggin middleware
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
+// Serve Frontend
+if (process.env.NODE_ENV === "production") {
+  // Set build folder as static
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+  // FIX: below code fixes app crashing on refresh in deployment
+  app.get("*", (_, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
+  });
+} else {
+  app.get("/", (_, res) => {
+    res.status(200).json({ message: "Welcome to the Invoice Platform" });
+  });
 }
+
 app.use(express.json());
 
 // Cookie parser
@@ -32,8 +44,3 @@ app.use(errorHandler);
 app.listen(PORT, () =>
   console.log(`Server started on port ${PORT}`.yellow.bold)
 );
-
-process.on("unhandledRejection", (err, promise) => {
-  console.log(`Error: ${err.message}.red`);
-  process.exit(1);
-});
