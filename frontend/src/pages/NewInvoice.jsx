@@ -4,11 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { createInvoice, reset } from "../features/invoices/invoiceSlice";
 import Spinner from "../components/Spinner";
+import BackButton from "../components/BackButton";
 
 function NewInvoice() {
   const { user } = useSelector((state) => state.auth);
   const { isLoading, isError, isSuccess, message } = useSelector(
-    (state) => state.invoice
+    (state) => state.invoices
   );
 
   const [paymentDueDate, setPaymentDueDate] = useState("");
@@ -33,7 +34,7 @@ function NewInvoice() {
 
     if (isSuccess) {
       dispatch(reset());
-      navigate("/tickets");
+      navigate("/invoices");
     }
 
     dispatch(reset());
@@ -93,6 +94,7 @@ function NewInvoice() {
 
   return (
     <>
+      <BackButton url="/" />
       <section className="heading">
         <h1>Create new invoice</h1>
         <p>Please fill out your informations below!</p>
@@ -231,7 +233,7 @@ function NewInvoice() {
           </div>
         ))}
         <button
-          className="btn btn-primary"
+          className="btn btn-primary mb-4"
           type="button"
           onClick={handleAddItem}
         >
@@ -247,9 +249,6 @@ function NewInvoice() {
             onChange={handleTaxesChange}
             required
           />
-        </div>
-        <div className="total-div">
-          <h3 className="total">Total: </h3>
         </div>
 
         <button type="submit" className="btn btn-primary submit">

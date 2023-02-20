@@ -37,7 +37,7 @@ h3 {
 
 .container {
   width: 100%;
-  max-width: 960px;
+  max-width: 1160px;
   margin: 0 auto;
   padding: 0 20px;
   text-align: center;
@@ -150,7 +150,6 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 14px;
 }
 
 .btn svg {
@@ -160,18 +159,6 @@ h3 {
 .btn-reverse {
   background: #fff;
   color: #000;
-}
-
-.submit {
-  margin: 0 auto;
-}
-
-.total-div {
-  display: flex;
-}
-
-.total {
-  margin-right: auto;
 }
 
 .btn-block {
@@ -198,31 +185,31 @@ h3 {
   transform: scale(0.98);
 }
 
-.ticket-created {
+.invoice-created {
   border: 1px solid #e6e6e6;
   border-radius: 5px;
   padding: 50px;
 }
 
-.ticket-number {
+.invoice-number {
   margin-bottom: 30px;
 }
 
-.ticket-number h2 {
+.invoice-number h2 {
   font-size: 2.3rem;
   margin-bottom: 10px;
 }
 
-.ticket-number p {
+.invoice-number p {
   font-size: 1.3rem;
 }
 
-.ticket-info {
+.invoice-info {
   font-size: 1.3rem;
 }
 
-.ticket,
-.ticket-headings {
+.invoice,
+.invoice-headings {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
@@ -235,60 +222,61 @@ h3 {
   text-align: center;
 }
 
-.ticket-headings {
+.invoice-headings {
   font-weight: 700;
 }
 
 .status {
-  background-color: #333;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background: #000;
   color: #fff;
-  width: 100px;
-  padding: 0 20px;
-  justify-self: center;
-  border-radius: 10px;
   font-size: 16px;
+  font-weight: 500;
   text-align: center;
+  appearance: button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.status-new {
-  background-color: green;
-  color: #fff;
-  border-radius: 10px;
-}
-
-.status-open {
+.status-paid {
   background-color: steelblue;
   color: #fff;
-  border-radius: 10px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
 }
 
-.status-closed {
+.status-unpaid {
   background-color: darkred;
   color: #fff;
-  border-radius: 10px;
+  border-radius: 5px;
 }
 
-.ticket-page {
+.invoice-page {
   position: relative;
   text-align: left;
 }
 
-.ticket-page h2 {
+.invoice-page h2 {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.ticket-page .btn {
+.invoice-page .btn {
   margin-bottom: 30px;
 }
 
-.ticket-page .btn-block {
+.invoice-page .btn-block {
   width: 100%;
   margin-top: 30px;
 }
 
-.ticket-desc {
+.invoice-desc {
   margin: 20px 0;
   font-size: 17px;
   background-color: #f4f4f4;
@@ -374,7 +362,7 @@ footer {
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+
   z-index: 5000;
   display: flex;
   justify-content: center;
@@ -388,6 +376,88 @@ footer {
   border-color: #000 transparent #555 transparent;
   border-radius: 50%;
   animation: spin 1.2s linear infinite;
+}
+
+.invoice-UI {
+  width: 700px;
+  margin: 50px auto;
+  font-family: "Roboto", sans-serif;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+  background-color: #fff;
+  color: #333;
+  padding: 40px;
+}
+
+.header-UI {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.header-left img {
+  height: 50px;
+}
+
+.header-right p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.invoice-info-UI {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.info-left h3,
+.info-right h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.info-left p,
+.info-right p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #333;
+}
+
+th,
+td {
+  border: 1px solid #333;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.invisible {
+  display: none;
+}
+
+th {
+  background-color: #ddd;
+  font-weight: bold;
+}
+
+.total {
+  text-align: right;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.footer {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 40px;
 }
 
 @keyframes spin {
@@ -408,7 +478,7 @@ footer {
     width: 90%;
   }
 
-  .ticket-created h2,
+  .invoice-created h2,
   .heading h1 {
     font-size: 2rem;
   }

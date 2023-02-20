@@ -30,7 +30,6 @@ const InvoicingSchema = new mongoose.Schema({
   },
   number: {
     type: String,
-    unique: true,
   },
   date: {
     type: Date,
@@ -62,21 +61,28 @@ const InvoicingSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    default: "new",
+    default: "unpaid",
   },
 });
-
 // invoice number
 InvoicingSchema.pre("save", function (next) {
-  this.number = `${uniqid()}-${new Date().toISOString().slice(0, 10)}`;
+  const dateString = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  this.number = `${uniqid().slice(4)}${dateString}`;
+  next();
+});
+
+// status to lower case
+InvoicingSchema.pre("save", function (next) {
+  this.status = this.status.toLowerCase();
   next();
 });
 
 // invoice total
 InvoicingSchema.pre("save", function (next) {
-  this.total =
-    this.items.reduce((acc, item) => acc + item.quantity * item.price, 0) -
-    this.taxes;
+  this.total = this.items.reduce(
+    (acc, item) => acc + item.quantity * item.price,
+    0
+  );
   next();
 });
 

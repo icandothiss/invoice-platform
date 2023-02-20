@@ -26,7 +26,7 @@ exports.getInvoicing = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Not authorized`, 401));
   }
 
-  res.status(200).json({ success: true, data: invoice });
+  res.status(200).json(invoice);
 });
 
 // @desc Get signle invoicings
@@ -50,6 +50,9 @@ exports.getInvoicings = asyncHandler(async (req, res, next) => {
 
   // Loop over removeFields and delete them from reqQuery
   removeFields.forEach((param) => delete reqQuery[param]);
+
+  // Add user property to reqQuery
+  reqQuery.user = req.user.id;
 
   // Create query string
   let queryStr = JSON.stringify(reqQuery);

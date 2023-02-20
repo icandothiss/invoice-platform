@@ -5,6 +5,6 @@ import invoiceReducer from "../features/invoices/invoiceSlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    invoice: invoiceReducer,
+    invoices: invoiceReducer,
   },
-}); 
+});

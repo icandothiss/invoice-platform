@@ -7,6 +7,9 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NewInvoice from "./pages/NewInvoice";
+import Invoices from "./pages/Invoices";
+import Invoice from "./pages/Invoice";
+import InvoiceSend from "./pages/InvoiceSend";
 
 function App() {
   return (
@@ -26,6 +29,31 @@ function App() {
                 </PrivateRoute>
               }
             />
+            <Route
+              path="/invoices"
+              element={
+                <PrivateRoute>
+                  <Invoices />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/invoice/:invoiceId"
+              element={
+                <PrivateRoute>
+                  <Invoice />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/invoice/:invoiceId"
+              element={
+                <PrivateRoute>
+                  <Invoice />
+                </PrivateRoute>
+              }
+            />
+            <Route path="/invoice/:invoiceId/pay" element={<InvoiceSend />} />
           </Routes>
         </div>
       </Router>

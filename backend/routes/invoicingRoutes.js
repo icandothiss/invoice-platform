@@ -19,4 +19,6 @@ router
   .put(protect, updateInvoicing)
   .delete(protect, deleteInvoicing);
 
+  router.route("/send-invoice-email/:id");
+
 module.exports = router;
