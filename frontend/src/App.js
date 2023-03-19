@@ -9,7 +9,10 @@ import Register from "./pages/Register";
 import NewInvoice from "./pages/NewInvoice";
 import Invoices from "./pages/Invoices";
 import Invoice from "./pages/Invoice";
-import InvoiceSend from "./pages/InvoiceSend";
+import InvoiceToPay from "./pages/InvoiceToPay";
+import UpdateInvoice from "./pages/UpdateInvoice";
+import ForgotPassword from "./pages/forgotPassword";
+import ResetPassword from "./pages/resetPassword";
 
 function App() {
   return (
@@ -21,6 +24,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route
               path="/new-invoice"
               element={
@@ -38,10 +43,10 @@ function App() {
               }
             />
             <Route
-              path="/invoice/:invoiceId"
+              path="/invoice/update/:invoiceId"
               element={
                 <PrivateRoute>
-                  <Invoice />
+                  <UpdateInvoice />
                 </PrivateRoute>
               }
             />
@@ -53,7 +58,14 @@ function App() {
                 </PrivateRoute>
               }
             />
-            <Route path="/invoice/:invoiceId/pay" element={<InvoiceSend />} />
+            <Route
+              path="/invoice/:invoiceId/pay"
+              element={
+                <PrivateRoute>
+                  <InvoiceToPay />
+                </PrivateRoute>
+              }
+            />
           </Routes>
         </div>
       </Router>

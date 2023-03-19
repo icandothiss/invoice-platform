@@ -6,11 +6,9 @@ import { getInvoice, reset } from "../features/invoices/invoiceSlice";
 import BackButton from "../components/BackButton";
 import Spinner from "../components/Spinner";
 import InvoiceItems from "../components/InvoiceItems";
-import React, { useRef } from "react";
-import emailjs from "@emailjs/browser";
+import SentInvoice from "../components/SentInvoice";
 
 function Invoice() {
-  const form = useRef();
   const [currentUrl, setCurrentUrl] = useState(window.location.href);
   const { invoice, isLoading, isSuccess, isError, message } = useSelector(
     (state) => state.invoices
@@ -36,42 +34,8 @@ function Invoice() {
     return <Spinner />;
   }
 
-  if (isError) {
-    return <h3>Something went wrong</h3>;
-  }
-
-  const sendEmail = (e) => {
-    e.preventDefault();
-
-    emailjs
-      .sendForm(
-        "service_e9dwtfa",
-        "template_1o5hdm1",
-        form.current,
-        "3gQh0KEA1uqj4R2V5"
-      )
-      .then(
-        (result) => {
-          console.log(result.text);
-        },
-        (error) => {
-          console.log(error.text);
-        }
-      );
-  };
   return (
     <>
-      <form ref={form} onSubmit={sendEmail}>
-        <input value={user.name} readOnly className="invisible" />
-        <input value={user.email} readOnly className="invisible" />
-        <textarea
-          name="message"
-          value={currentUrl}
-          readOnly
-          className="invisible"
-        />
-        <input type="submit" value="Send" />
-      </form>
       <BackButton url="/invoices/" />
       <div className="invoice-UI">
         <div className="header-UI">
@@ -91,6 +55,7 @@ function Invoice() {
             <h3>Billed To:</h3>
             <p>{invoice.clientName}</p>
             <p>{invoice.clientAddress}</p>
+            <p>{invoice.clientEmail}</p>
           </div>
           <div className="info-right">
             <h3>Payment Due:</h3>
@@ -138,6 +103,7 @@ function Invoice() {
           <p>Thank you for your business!</p>
         </div>
       </div>
+      <SentInvoice />
     </>
   );
 }

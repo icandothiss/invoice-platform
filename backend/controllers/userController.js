@@ -1,10 +1,12 @@
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../utils/errorResponse");
 const User = require("../models/userModel");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
-/** @desc Register a new user
- * @route POST /api/users
- * @access Public*/
+// @desc Register a new user
+//  POST /api/users
+//  @access Public
 const registerUser = asyncHandler(async (req, res, next) => {
   const { name, email, password, password2, phone } = req.body;
 
@@ -62,16 +64,59 @@ const loginUser = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
-// @desc Login a user
+// @desc Get a user
 // @route GET /api/users/me
 // @access Private
 const getMe = asyncHandler(async (req, res, next) => {
-  const user = {
-    id: req.user._id,
-    email: req.user.email,
-    name: req.user.name,
-  };
+  const user = req.user;
+
   res.status(200).json(user);
+});
+
+// @desc      Log user out / clear cookie
+// @route     GET /api/v1/auth/logout
+// @access    Public
+const logout = asyncHandler(async (req, res, next) => {
+  res.cookie("token", "none", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    data: {},
+  });
+});
+
+// @desc      Reset password
+// @route     PUT /api/v1/auth/resetpassword/:resettoken
+// @access    Public
+const resetPassword = asyncHandler(async (req, res, next) => {
+  console.log("fds");
+  resetToken = req.query.token;
+
+  // Get hashed token
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ErrorResponse("Invalid token", 400));
+  }
+
+  // Set new password
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+
+  sendTokenResponse(user, 200, res);
 });
 
 // Get token from model, create cookie and send response
@@ -86,10 +131,6 @@ const sendTokenResponse = (user, statusCode, res) => {
     httpOnly: true,
   };
 
-  if (process.env.NODE_ENV === "production") {
-    options.secure = true;
-  }
-
   res.status(statusCode).cookie("token", token, options).json({
     success: true,
     token,
@@ -99,8 +140,68 @@ const sendTokenResponse = (user, statusCode, res) => {
   });
 };
 
+// @desc Forgot Password
+// @route POST /api/users/forgot-password
+// @access Public
+const forgotPassword = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+
+  // Validate email
+  if (!email) {
+    return next(new ErrorResponse("Please provide an email address", 400));
+  }
+
+  // Check if user exists
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(
+      new ErrorResponse("No user found with that email address", 404)
+    );
+  }
+
+  // Generate reset token
+  const resetToken = user.generateResetPasswordToken();
+
+  await user.save();
+
+  // Create reset URL
+  const resetUrl = `${req.protocol}://localhost:${process.env.REACT_APP_URL}/reset-password?token=${resetToken}`;
+
+  // Create nodemailer transporter
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.MY_EMAIL,
+      pass: process.env.MY_EMAIL_PASSWORD,
+    },
+  });
+  try {
+    await transporter.sendMail({
+      to: email,
+      subject: "Password Reset Request",
+      html: `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`,
+    });
+
+    res.status(200).json({
+      data: user,
+      success: true,
+      message: "Reset email sent",
+    });
+  } catch (e) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save({ ValidateBeforeSave: false });
+
+    return next(new ErrorResponse("Email could not be saved", 500));
+  }
+});
+
 module.exports = {
   registerUser,
   loginUser,
   getMe,
+  resetPassword,
+  forgotPassword,
+  logout,
 };

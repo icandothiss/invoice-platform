@@ -7,22 +7,18 @@ const InvoicingSchema = new mongoose.Schema({
     require: true,
     ref: "User",
   },
-  clientName: {
-    type: String,
-    required: [true, "Please add the name of the client"],
-    trim: true,
-  },
-  clientAddress: {
-    type: String,
-    required: [true, "Please add the address of the client"],
+  client: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    require: true,
   },
   clientEmail: {
     type: String,
+    required: [true, "Please add an email"],
     match: [
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-      "Please add a valid email for the client",
+      "Please add a valid email",
     ],
-    required: [true, "Please add an email"],
   },
   taxes: {
     type: Number,

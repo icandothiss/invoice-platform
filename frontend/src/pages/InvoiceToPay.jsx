@@ -2,12 +2,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getInvoice, reset } from "../features/invoices/invoiceSlice";
-import BackButton from "../components/BackButton";
+import {
+  getInvoice,
+  reset,
+  payInvoice,
+} from "../features/invoices/invoiceSlice";
 import Spinner from "../components/Spinner";
 import InvoiceItems from "../components/InvoiceItems";
 import React, { useRef } from "react";
-import emailjs from "@emailjs/browser";
+import { Navigate } from "react-router-dom";
 
 function Invoice() {
   const form = useRef();
@@ -21,12 +24,22 @@ function Invoice() {
   const dispatch = useDispatch();
   const { invoiceId } = useParams();
 
+  const handlePayClick = () => {
+    if (window.confirm("Are you sure you want to send payment?")) {
+      dispatch(payInvoice(invoiceId));
+      toast.success("Invoice has been marked as paid.");
+    }
+  };
+
   useEffect(() => {
     if (isError) {
       toast.error(message);
     }
     if (isSuccess) {
       dispatch(reset);
+      if (!user || user.email !== invoice.clientEmail) {
+        return <Navigate to="/" />;
+      }
     }
 
     dispatch(getInvoice(invoiceId));
@@ -40,12 +53,8 @@ function Invoice() {
     return <h3>Something went wrong</h3>;
   }
 
-  const Pay = () => {};
-
   return (
     <>
-      <button onClick={Pay}>Pay</button>
-      <BackButton url="/invoices/" />
       <div className="invoice-UI">
         <div className="header-UI">
           <div className="header-left">
@@ -64,6 +73,7 @@ function Invoice() {
             <h3>Billed To:</h3>
             <p>{invoice.clientName}</p>
             <p>{invoice.clientAddress}</p>
+            <p>{invoice.clientEmail}</p>
           </div>
           <div className="info-right">
             <h3>Payment Due:</h3>
@@ -111,6 +121,7 @@ function Invoice() {
           <p>Thank you for your business!</p>
         </div>
       </div>
+      <button onClick={handlePayClick}>pay</button>
     </>
   );
 }

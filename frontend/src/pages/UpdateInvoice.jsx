@@ -1,26 +1,22 @@
 import { useState, useEffect } from "react";
+import { FaTrash } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { createInvoice, reset } from "../features/invoices/invoiceSlice";
+import {
+  getInvoice,
+  reset,
+  updateInvoice,
+} from "../features/invoices/invoiceSlice";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 
-function NewInvoice() {
-  const { user } = useSelector((state) => state.auth);
-  const { isLoading, isError, isSuccess, message } = useSelector(
+function UpdateInvoice() {
+  const { invoice, isLoading, isSuccess, isError, message } = useSelector(
     (state) => state.invoices
   );
-
-  const [paymentDueDate, setPaymentDueDate] = useState("");
-  const [clientName, setClientName] = useState("");
-  const [clientAddress, setClientAddress] = useState("");
-  const [clientEmail, setClientEmail] = useState("");
-  const [companyName, setCompanyName] = useState(user.name);
-  const [companyAddress, setCompanyAddress] = useState(user.email);
-  const [companyPhone, setCompanyPhone] = useState(user.phone);
-  const [items, setItems] = useState([{ item: "", quantity: "", price: "" }]);
-  const [taxes, setTaxes] = useState("");
+  const { user } = useSelector((state) => state.auth);
+  const { invoiceId } = useParams();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -30,59 +26,69 @@ function NewInvoice() {
       toast.error(message);
     }
 
-    if (isSuccess) {
-      dispatch(reset());
-      navigate("/invoices");
-    }
+    dispatch(getInvoice(invoiceId));
+  }, [isError, message, invoiceId, dispatch]);
 
-    dispatch(reset());
-  }, [dispatch, isError, isSuccess, message, navigate]);
+  const [formData, setFormData] = useState({
+    paymentDueDate:
+      "Mon Feb 20 2023 01:00:00 GMT+0100 (Central European Standard Time)",
+    taxes: 45,
+    adress: "tunisia",
+    clientEmail: "oussama@google.fr",
+  });
 
-  const handlePaymentDueChange = (event) => {
-    setPaymentDueDate(event.target.value);
-  };
-
-  const handleBilledNameChange = (event) => {
-    setClientName(event.target.value);
-  };
-
-  const handleBilledAddressChange = (event) => {
-    setClientAddress(event.target.value);
-  };
-
-  const handleBilledEmailChange = (event) => {
-    setClientEmail(event.target.value);
-  };
-
-  const handleTaxesChange = (event) => {
-    setTaxes(event.target.value);
-  };
+  const [items, setItems] = useState([{ item: "", quantity: "", price: "" }]);
 
   const handleAddItem = () => {
     setItems([...items, { item: "", quantity: "", price: "" }]);
   };
 
-  const handleInvoiceItemChange = (index, event) => {
-    const updatedItems = [...items];
-    updatedItems[index][event.target.name] = event.target.value;
-    setItems(updatedItems);
+  const handleInputChange = (event) => {
+    const { name, value, type } = event.target;
+    const newValue = type === "number" ? Number(value) : String(value);
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: newValue,
+    }));
   };
+
+  const handleItemsChange = (event, index) => {
+    const { name, value, type } = event.target;
+    const newValue = type === "number" ? Number(value) : String(value);
+
+    setFormData((prevData) => ({
+      ...prevData,
+      items: prevData.items.map((item, i) =>
+        i === index ? { ...item, [name]: newValue } : item
+      ),
+    }));
+  };
+
+  useEffect(() => {
+    if (invoice && invoice.items) {
+      setFormData(invoice);
+      setItems(invoice.items);
+    }
+  }, [invoice]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    dispatch(
-      createInvoice({
-        clientEmail,
-        taxes,
-        paymentDueDate,
-        items,
-      })
-    );
+    dispatch(updateInvoice({ id: invoiceId, ...formData, items }));
+    navigate("/");
   };
+
+  function handleDeleteItem(index) {
+    const newItems = [...items];
+    newItems.splice(index, 1);
+    setItems(newItems);
+  }
 
   if (isLoading) {
     return <Spinner />;
   }
+
+  console.log(formData.taxes);
 
   return (
     <>
@@ -93,6 +99,7 @@ function NewInvoice() {
       </section>
 
       <form onSubmit={handleSubmit}>
+        {/* Company Information */}
         <h2>Company Information</h2>
         <div className="form-group">
           <label htmlFor="companyName">Name:</label>
@@ -100,7 +107,7 @@ function NewInvoice() {
             type="text"
             id="companyName"
             className="form-control"
-            value={companyName}
+            value={user.name}
             readOnly
           />
         </div>
@@ -110,7 +117,7 @@ function NewInvoice() {
             type="text"
             id="companyAddress"
             className="form-control"
-            value={companyAddress}
+            value={user.email}
             readOnly
           />
         </div>
@@ -120,58 +127,42 @@ function NewInvoice() {
             type="text"
             id="companyPhone"
             className="form-control"
-            value={companyPhone}
+            value={user.phone}
             readOnly
           />
         </div>
+
+        {/* Invoice Information */}
         <h2>Invoice Information</h2>
         <div className="form-group">
           <label htmlFor="paymentDue">Payment Due:</label>
           <input
-            type="date"
+            name="paymentDueDate"
+            type="text"
             id="paymentDue"
             className="form-control"
-            value={paymentDueDate}
-            onChange={handlePaymentDueChange}
-            required
+            value={formData.paymentDueDate}
+            onChange={handleInputChange}
           />
         </div>
+
+        {/* Billed To */}
         <h2>Billed To:</h2>
-        <div className="form-group">
-          <label htmlFor="billedName">Name:</label>
-          <input
-            type="text"
-            id="billedName"
-            className="form-control"
-            value={clientName}
-            onChange={handleBilledNameChange}
-            required
-          />
-        </div>
         <div className="form-group">
           <label htmlFor="billedEmail">Email:</label>
           <input
             type="email"
-            name="email"
+            name="clientEmail"
             id="ClientEmail"
             className="form-control"
-            value={clientEmail}
-            onChange={handleBilledEmailChange}
-            placeholder="Enteremail"
+            placeholder="Enter email ..."
+            value={formData.clientEmail}
+            onChange={handleInputChange}
             required
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="billedAddress">Address:</label>
-          <input
-            type="text"
-            id="billedAddress"
-            className="form-control"
-            value={clientAddress}
-            onChange={handleBilledAddressChange}
-            required
-          />
-        </div>
+
+        {/* Invoice Items */}
         <h3>Invoice Items:</h3>
         {items.map((item, index) => (
           <div key={index} className="invoice-item">
@@ -183,7 +174,7 @@ function NewInvoice() {
                 className="form-control"
                 name="item"
                 value={item.item}
-                onChange={(event) => handleInvoiceItemChange(index, event)}
+                onChange={(e) => handleItemsChange(e, index)}
                 required
               />
             </div>
@@ -195,7 +186,7 @@ function NewInvoice() {
                 className="form-control"
                 name="quantity"
                 value={item.quantity}
-                onChange={(event) => handleInvoiceItemChange(index, event)}
+                onChange={(e) => handleItemsChange(e, index)}
                 required
               />
             </div>
@@ -207,10 +198,13 @@ function NewInvoice() {
                 className="form-control"
                 name="price"
                 value={item.price}
-                onChange={(event) => handleInvoiceItemChange(index, event)}
+                onChange={(e) => handleItemsChange(e, index)}
                 required
               />
             </div>
+            <button type="button" onClick={() => handleDeleteItem(index)}>
+              <FaTrash />
+            </button>
           </div>
         ))}
         <button
@@ -223,11 +217,12 @@ function NewInvoice() {
         <div className="form-group">
           <label htmlFor="taxes">Taxes:</label>
           <input
+            name="taxes"
             type="Number"
             id="taxes"
             className="form-control"
-            value={taxes}
-            onChange={handleTaxesChange}
+            value={formData.taxes}
+            onChange={handleInputChange}
             required
           />
         </div>
@@ -239,4 +234,4 @@ function NewInvoice() {
     </>
   );
 }
-export default NewInvoice;
+export default UpdateInvoice;

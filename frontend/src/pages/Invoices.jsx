@@ -1,12 +1,13 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 import { getInvoices, reset } from "../features/invoices/invoiceSlice";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 import InvoiceItem from "../components/InvoiceItem";
 
 function Invoices() {
-  const { invoices, isLoading, isSuccess } = useSelector(
+  const { invoices, isLoading, isSuccess, message, isError } = useSelector(
     (state) => state.invoices
   );
 
@@ -14,6 +15,9 @@ function Invoices() {
 
   useEffect(() => {
     return () => {
+      if (isError) {
+        toast.error(message);
+      }
       if (isSuccess) {
         dispatch(reset());
       }
@@ -38,12 +42,13 @@ function Invoices() {
             <tr className="table-row">
               <th>Invoice Number</th>
               <th>Cl Name</th>
-              <th>Cl Email</th>
               <th>Date</th>
               <th>Due</th>
               <th>Total</th>
+              <th>Update</th>
+              <th>Delete</th>
               <th>Status</th>
-              <th>Actions</th>
+              <th>View</th>
             </tr>
           </thead>
           <tbody id="invoices">

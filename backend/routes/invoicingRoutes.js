@@ -5,6 +5,7 @@ const {
   createInvoicing,
   updateInvoicing,
   deleteInvoicing,
+  payInvoicing,
 } = require("../controllers/invoicingController");
 
 const router = express.Router();
@@ -19,6 +20,6 @@ router
   .put(protect, updateInvoicing)
   .delete(protect, deleteInvoicing);
 
-  router.route("/send-invoice-email/:id");
+router.route("/:id/pay").put(payInvoicing);
 
 module.exports = router;

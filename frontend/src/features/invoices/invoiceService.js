@@ -41,19 +41,35 @@ const getInvoice = async (invoiceId, token) => {
   return response.data;
 };
 
-// pay invoice
-const payInvoice = async (invoiceId, token) => {
+// Update Invoice
+const updateInvoice = async (invoiceId, invoice, token) => {
   const config = {
     headers: {
       authorization: `Bearer ${token}`,
     },
   };
 
-  const response = await axios.put(
-    API_URL + invoiceId,
-    { status: "paid" } + "/pay",
-    config
-  );
+  const response = await axios.put(API_URL + invoiceId, invoice, config);
+
+  return response.data;
+};
+
+// Pay invoice
+const payInvoice = async (invoiceId) => {
+  const response = await axios.put(API_URL + invoiceId + "/pay");
+
+  return response.data;
+};
+
+// Delete invoice
+const deleteInvoice = async (invoiceId, token) => {
+  const config = {
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+  };
+
+  const response = await axios.delete(API_URL + invoiceId, config);
 
   return response.data;
 };
@@ -63,6 +79,8 @@ const invoiceService = {
   getInvoices,
   getInvoice,
   payInvoice,
+  updateInvoice,
+  deleteInvoice,
 };
 
 export default invoiceService;

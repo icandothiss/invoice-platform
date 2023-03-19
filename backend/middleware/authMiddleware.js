@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
+const ErrorResponse = require("../utils/errorResponse");
 
 const protect = asyncHandler(async (req, res, next) => {
   let token;
@@ -19,14 +20,15 @@ const protect = asyncHandler(async (req, res, next) => {
 
       next();
     } catch (e) {
-      console.log(e);
       res.status(401);
-      throw new Error("Not authorized");
+      return next(
+        new ErrorResponse("Not authorized to access this route", 401)
+      );
     }
   }
 
   if (!token) {
-    return res.status(401).json({err: "Not authorized"});
+    return next(new ErrorResponse("Not authorized to access this route", 401));
   }
 });
 
