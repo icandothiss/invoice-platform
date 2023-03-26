@@ -20,14 +20,13 @@ function Invoice() {
   const { invoiceId } = useParams();
 
   useEffect(() => {
+    dispatch(getInvoice(invoiceId));
+  }, [dispatch, invoiceId]);
+
+  useEffect(() => {
     if (isError) {
       toast.error(message);
     }
-    if (isSuccess) {
-      dispatch(reset);
-    }
-
-    dispatch(getInvoice(invoiceId));
   }, [isError, message, invoiceId]);
 
   if (isLoading) {

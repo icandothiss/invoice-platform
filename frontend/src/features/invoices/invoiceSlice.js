@@ -137,7 +137,12 @@ export const invoiceSlice = createSlice({
   name: "invoice",
   initialState,
   reducers: {
-    reset: (state) => initialState,
+    reset: (state) => {
+      state.isError = false;
+      state.isSuccess = false;
+      state.isLoading = false;
+      state.message = "";
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -158,7 +163,6 @@ export const invoiceSlice = createSlice({
       })
       .addCase(getInvoices.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isSuccess = true;
         state.invoices = action.payload;
       })
       .addCase(getInvoices.rejected, (state, action) => {
@@ -166,17 +170,10 @@ export const invoiceSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
       })
-      .addCase(getInvoice.pending, (state) => {
-        state.isLoading = true;
-      })
       .addCase(getInvoice.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.isSuccess = true;
         state.invoice = action.payload;
       })
       .addCase(getInvoice.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isError = true;
         state.message = action.payload;
       })
       .addCase(payInvoice.pending, (state) => {

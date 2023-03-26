@@ -14,15 +14,10 @@ function Invoices() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    return () => {
-      if (isError) {
-        toast.error(message);
-      }
-      if (isSuccess) {
-        dispatch(reset());
-      }
-    };
-  }, [dispatch, isSuccess]);
+    if (isError) {
+      toast.error(message);
+    }
+  }, [dispatch, isSuccess, isError, message]);
 
   useEffect(() => {
     dispatch(getInvoices());

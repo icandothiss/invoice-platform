@@ -83,4 +83,17 @@ userSchema.methods.generateResetPasswordToken = function () {
   return resetToken;
 };
 
+userSchema.methods.generateConfirmEmailToken = function () {
+  // Generate token
+  const confirmToken = crypto.randomBytes(20).toString("hex");
+  // Hash token and set to confirmEmailToken field
+  this.confirmEmailToken = crypto
+    .createHash("sha256")
+    .update(confirmToken)
+    .digest("hex");
+    
+
+  return confirmToken;
+};
+
 module.exports = mongoose.model("User", userSchema);

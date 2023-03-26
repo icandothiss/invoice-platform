@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 const PrivateRoute = ({ children }) => {
   const { user } = useSelector((state) => state.auth);
 
-  if (user) return children;
+  if (user && user.isEmailVerified === true) return children;
 
   return <Navigate to="/login" />;
 };

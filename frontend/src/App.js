@@ -11,8 +11,9 @@ import Invoices from "./pages/Invoices";
 import Invoice from "./pages/Invoice";
 import InvoiceToPay from "./pages/InvoiceToPay";
 import UpdateInvoice from "./pages/UpdateInvoice";
-import ForgotPassword from "./pages/forgotPassword";
-import ResetPassword from "./pages/resetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import ConfirmEmail from "./pages/ConfirmEmail";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/confirm-email" element={<ConfirmEmail />} />
             <Route
               path="/new-invoice"
               element={

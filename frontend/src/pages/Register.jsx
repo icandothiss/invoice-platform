@@ -15,6 +15,8 @@ function Register() {
     phone: "",
   });
 
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
   const { name, email, password, password2, phone } = formData;
 
   const dispatch = useDispatch();
@@ -28,13 +30,6 @@ function Register() {
     if (isError) {
       toast.error(message);
     }
-
-    // Redirect when logged in
-    if (isSuccess || user) {
-      navigate("/");
-    }
-
-    dispatch(reset());
   }, [isError, isSuccess, user, message, navigate, dispatch]);
 
   const onChange = (e) => {
@@ -59,91 +54,101 @@ function Register() {
       };
 
       dispatch(register(userData));
+
+      setIsSubmitted(true);
     }
   };
 
   if (isLoading) {
     return <Spinner />;
   }
+  console.log(isError);
 
   return (
     <>
-      <section className="heading">
-        <h1>
-          <FaUser /> Register
-        </h1>
-        <p>Please create an account</p>
-      </section>
+      {isSubmitted && !isError ? (
+        <h1>We sent a message to your email to Verify</h1>
+      ) : (
+        <>
+          <section className="heading">
+            <h1>
+              <FaUser /> Register
+            </h1>
+            <p>Please create an account</p>
+          </section>
 
-      <section className="form">
-        <form onSubmit={onSubmit}>
-          <div className="form-group">
-            <input
-              type="text"
-              className="form-control"
-              id="name"
-              name="name"
-              value={name}
-              onChange={onChange}
-              placeholder="Enter your name"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="email"
-              className="form-control"
-              id="email"
-              name="email"
-              value={email}
-              onChange={onChange}
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="password"
-              className="form-control"
-              id="password"
-              name="password"
-              value={password}
-              onChange={onChange}
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="password"
-              className="form-control"
-              id="password2"
-              name="password2"
-              value={password2}
-              onChange={onChange}
-              placeholder="Confirm password"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="tel"
-              className="form-control"
-              id="phone"
-              name="phone"
-              value={phone}
-              onChange={onChange}
-              placeholder="Enter your phone number"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <button className="btn btn-block">Submit</button>
-          </div>
-        </form>
-      </section>
+          <section className="form">
+            <form onSubmit={onSubmit}>
+              <div className="form-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  id="name"
+                  name="name"
+                  value={name}
+                  onChange={onChange}
+                  placeholder="Enter your name"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  type="email"
+                  className="form-control"
+                  id="email"
+                  name="email"
+                  value={email}
+                  onChange={onChange}
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  type="password"
+                  className="form-control"
+                  id="password"
+                  name="password"
+                  value={password}
+                  onChange={onChange}
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  type="password"
+                  className="form-control"
+                  id="password2"
+                  name="password2"
+                  value={password2}
+                  onChange={onChange}
+                  placeholder="Confirm password"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  type="tel"
+                  className="form-control"
+                  id="phone"
+                  name="phone"
+                  value={phone}
+                  onChange={onChange}
+                  placeholder="Enter your phone number"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <button type="submit" className="btn btn-block">
+                  Submit
+                </button>
+              </div>
+            </form>
+          </section>
+        </>
+      )}
     </>
   );
 }
-
 export default Register;

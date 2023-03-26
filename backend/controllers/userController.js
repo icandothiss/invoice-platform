@@ -9,7 +9,6 @@ const crypto = require("crypto");
 //  @access Public
 const registerUser = asyncHandler(async (req, res, next) => {
   const { name, email, password, password2, phone } = req.body;
-
   //Validation
   if (!name || !email || !password || !password2 || !phone) {
     return next(new ErrorResponse(`Please include all fields`, 400));
@@ -26,15 +25,39 @@ const registerUser = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse("User already exists", 400));
   }
 
-  // create user
-  const user = await User.create({
-    name,
-    email,
-    password,
-    phone,
+  // Create nodemailer transporter
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.MY_EMAIL,
+      pass: process.env.MY_EMAIL_PASSWORD,
+    },
   });
+  try {
+    // create user
+    const user = await User.create({
+      name,
+      email,
+      password,
+      phone,
+    });
 
-  sendTokenResponse(user, 200, res);
+    const confirmToken = user.generateConfirmEmailToken();
+
+    user.resetPasswordToken = confirmToken;
+
+    await user.save();
+
+    await transporter.sendMail({
+      to: email,
+      subject: "Email Confirmation Request",
+      html: `Please click this link to confirm your email: ${req.protocol}://localhost:${process.env.REACT_APP_URL}/confirm-email?token=${user.confirmEmailToken}`,
+    });
+
+    sendTokenResponse(user, 200, res);
+  } catch (e) {
+    return next(new ErrorResponse("Email could not be sent", 500));
+  }
 });
 
 // @desc Login a user
@@ -92,7 +115,6 @@ const logout = asyncHandler(async (req, res, next) => {
 // @route     PUT /api/v1/auth/resetpassword/:resettoken
 // @access    Public
 const resetPassword = asyncHandler(async (req, res, next) => {
-  console.log("fds");
   resetToken = req.query.token;
 
   // Get hashed token
@@ -118,27 +140,6 @@ const resetPassword = asyncHandler(async (req, res, next) => {
 
   sendTokenResponse(user, 200, res);
 });
-
-// Get token from model, create cookie and send response
-const sendTokenResponse = (user, statusCode, res) => {
-  // Create token
-  const token = user.getSignedJwtToken();
-
-  const options = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-  };
-
-  res.status(statusCode).cookie("token", token, options).json({
-    success: true,
-    token,
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-  });
-};
 
 // @desc Forgot Password
 // @route POST /api/users/forgot-password
@@ -197,6 +198,50 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
   }
 });
 
+// Get token from model, create cookie and send response
+const sendTokenResponse = (user, statusCode, res) => {
+  // Create token
+  const token = user.getSignedJwtToken();
+
+  const options = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+
+  res.status(statusCode).cookie("token", token, options).json({
+    success: true,
+    token,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    isEmailVerified: user.isEmailVerified,
+    confirmEmailToken: user.confirmEmailToken,
+  });
+};
+
+// @desc Confirm email
+// @route GET /api/auth/confirm-email
+// @access Private
+const confirmEmail = asyncHandler(async (req, res, next) => {
+  const confirmEmailToken = req.body.token;
+
+  const user = await User.findOne({ confirmEmailToken });
+
+  if (!user) {
+    return next(new ErrorResponse("wrong token", 400));
+  }
+
+  user.isEmailVerified = true;
+
+  await user.save();
+
+  console.log(user);
+
+  sendTokenResponse(user, 200, res);
+});
+
 module.exports = {
   registerUser,
   loginUser,
@@ -204,4 +249,5 @@ module.exports = {
   resetPassword,
   forgotPassword,
   logout,
+  confirmEmail,
 };

@@ -83,6 +83,24 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
+export const confirmEmail = createAsyncThunk(
+  "auth/confirmEmail",
+  async (token, thunkAPI) => {
+    try {
+      const response = await authService.confirmEmail(token);
+      console.log(token);
+      return response;
+    } catch (error) {
+      const message =
+        error.response.data.error ||
+        error.response.data.message ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -107,6 +125,7 @@ export const authSlice = createSlice({
       .addCase(register.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
+        state.isSuccess = false;
         state.message = action.payload;
         state.user = null;
       })
@@ -154,6 +173,24 @@ export const authSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
         state.user = null;
+      })
+      .addCase(confirmEmail.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.isSuccess = false;
+        state.message = "";
+      })
+      .addCase(confirmEmail.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        console.log(action);
+        state.user = action.payload;
+      })
+      .addCase(confirmEmail.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        state.user = action.payload;
       });
   },
 });

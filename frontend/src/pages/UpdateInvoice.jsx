@@ -22,12 +22,20 @@ function UpdateInvoice() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    dispatch(getInvoice(invoiceId));
+  }, [dispatch, invoiceId]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("invoice updated!");
+    }
+
     if (isError) {
       toast.error(message);
     }
 
-    dispatch(getInvoice(invoiceId));
-  }, [isError, message, invoiceId, dispatch]);
+    dispatch(reset());
+  }, [isError, message, invoiceId, dispatch, isSuccess, navigate]);
 
   const [formData, setFormData] = useState({
     paymentDueDate:
@@ -35,9 +43,10 @@ function UpdateInvoice() {
     taxes: 45,
     adress: "tunisia",
     clientEmail: "oussama@google.fr",
+    items: [{ item: "", quantity: "", price: "" }],
   });
 
-  const [items, setItems] = useState([{ item: "", quantity: "", price: "" }]);
+  const [items, setItems] = useState(formData.items);
 
   const handleAddItem = () => {
     setItems([...items, { item: "", quantity: "", price: "" }]);
@@ -55,14 +64,18 @@ function UpdateInvoice() {
 
   const handleItemsChange = (event, index) => {
     const { name, value, type } = event.target;
+    console.log(name, value, type);
     const newValue = type === "number" ? Number(value) : String(value);
 
-    setFormData((prevData) => ({
-      ...prevData,
-      items: prevData.items.map((item, i) =>
-        i === index ? { ...item, [name]: newValue } : item
-      ),
-    }));
+    setItems((prevItems) => {
+      return prevItems.map((item, i) => {
+        if (i === index) {
+          return { ...item, [name]: newValue };
+        } else {
+          return item;
+        }
+      });
+    });
   };
 
   useEffect(() => {
@@ -75,7 +88,7 @@ function UpdateInvoice() {
   const handleSubmit = (event) => {
     event.preventDefault();
     dispatch(updateInvoice({ id: invoiceId, ...formData, items }));
-    navigate("/");
+    navigate("/invoices");
   };
 
   function handleDeleteItem(index) {
@@ -87,8 +100,6 @@ function UpdateInvoice() {
   if (isLoading) {
     return <Spinner />;
   }
-
-  console.log(formData.taxes);
 
   return (
     <>
