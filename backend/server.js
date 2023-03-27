@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const colors = require("colors");
 require("dotenv").config();
 const { errorHandler } = require("./middleware/errorMiddleware");
@@ -13,6 +14,8 @@ connectDB();
 const app = express();
 
 app.use(express.json());
+
+app.use(cors());
 
 // Cookie parser
 app.use(cookieParser());
