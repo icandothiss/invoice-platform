@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://invoice-platform.onrender.com";
+const API_URL = "/api/auth/";
 
 // Register user
 const register = async (userData) => {
