@@ -5,7 +5,7 @@ const { errorHandler } = require("./middleware/errorMiddleware");
 const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
 const morgan = require("morgan");
-const PORT = process.env.PORT || 8000;
+const PORT = 5000 || 8000;
 
 // Connect to database
 connectDB();

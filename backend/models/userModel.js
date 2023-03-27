@@ -57,8 +57,8 @@ userSchema.pre("save", async function (next) {
 
 // Sign JWT and return
 userSchema.methods.getSignedJwtToken = function () {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE,
+  return jwt.sign({ id: this._id }, "fdsgsdfhdhsdfhgdsgf", {
+    expiresIn: 30,
   });
 };
 
@@ -91,7 +91,6 @@ userSchema.methods.generateConfirmEmailToken = function () {
     .createHash("sha256")
     .update(confirmToken)
     .digest("hex");
-    
 
   return confirmToken;
 };

@@ -1,0 +1,8 @@
+REACT_APP_URL = 3000
+MONGO_URI = mongodb+srv://oussama123:oussama123@cluster0.nvcebn1.mongodb.net/?retryWrites=true&w=majority
+SENDGRID_API_KEY = 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
+JWT_SECRET = fdsgsdfhdhsdfhgdsgf
+JWT_EXPIRE = 30d
+JWT_COOKIE_EXPIRE = 30
+MY_EMAIL_PASSWORD = jomjfoklntwgfske
+MY_EMAIL = jesusexample245@gmail.com

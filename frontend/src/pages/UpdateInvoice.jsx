@@ -26,10 +26,6 @@ function UpdateInvoice() {
   }, [dispatch, invoiceId]);
 
   useEffect(() => {
-    if (isSuccess) {
-      toast.success("invoice updated!");
-    }
-
     if (isError) {
       toast.error(message);
     }
@@ -89,6 +85,7 @@ function UpdateInvoice() {
     event.preventDefault();
     dispatch(updateInvoice({ id: invoiceId, ...formData, items }));
     navigate("/invoices");
+    toast.success("invoice updated!");
   };
 
   function handleDeleteItem(index) {

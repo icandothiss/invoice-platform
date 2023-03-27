@@ -29,8 +29,8 @@ const registerUser = asyncHandler(async (req, res, next) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.MY_EMAIL,
-      pass: process.env.MY_EMAIL_PASSWORD,
+      user: "jesusexample245@gmail.com",
+      pass: "jomjfoklntwgfske",
     },
   });
   try {
@@ -51,7 +51,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     await transporter.sendMail({
       to: email,
       subject: "Email Confirmation Request",
-      html: `Please click this link to confirm your email: ${req.protocol}://localhost:${process.env.REACT_APP_URL}/confirm-email?token=${user.confirmEmailToken}`,
+      html: `Please click this link to confirm your email: ${req.protocol}://localhost:3000/confirm-email?token=${user.confirmEmailToken}`,
     });
 
     sendTokenResponse(user, 200, res);
@@ -166,14 +166,14 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
   await user.save();
 
   // Create reset URL
-  const resetUrl = `${req.protocol}://localhost:${process.env.REACT_APP_URL}/reset-password?token=${resetToken}`;
+  const resetUrl = `${req.protocol}://localhost:3000/reset-password?token=${resetToken}`;
 
   // Create nodemailer transporter
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.MY_EMAIL,
-      pass: process.env.MY_EMAIL_PASSWORD,
+      user: "jesusexample245@gmail.com",
+      pass: "jomjfoklntwgfske",
     },
   });
   try {
@@ -204,9 +204,7 @@ const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
 
   const options = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-    ),
+    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     httpOnly: true,
   };
 
