@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "/api/invoicings/";
+const API_URL = "https://invoice-platform.onrender.com/api/invoicings/";
 
 // Create new invoice
 const createInvoice = async (invoiceData, token) => {
